@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP3 - Portal Educativo Completo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilo básico para controlar la visibilidad de las secciones */
+        .hidden { display: none; }
+        /* Estilo para la barra de color celeste en el formulario (requisito) */
+        .form-header-bar {
+            height: 10px;
+            background-color: theme('colors.sky.400');
+            border-top-left-radius: 0.75rem; /* rounded-xl */
+            border-top-right-radius: 0.75rem;
+        }
+    </style>
+    <script src="script.js"></script>
+</head>
+<body class="bg-gradient-to-br from-sky-100 to-blue-100 min-h-screen flex flex-col">
+
+    <header class="bg-blue-800 text-white p-4 text-center text-2xl font-bold shadow-lg">
+        <span class="text-yellow-400">☁️</span> Portal Educativo
+    </header>
+
+    <nav class="bg-sky-400 shadow-md flex justify-center gap-6 py-3 font-semibold text-white">
+        <button onclick="mostrarSeccion('home')" class="hover:text-blue-900 transition" data-id="home">Inicio</button>
+        <button onclick="mostrarSeccion('cargar')" class="hover:text-blue-900 transition" data-id="cargar">Cargar Alumno</button>
+        <button onclick="mostrarSeccion('listado')" class="hover:text-blue-900 transition" data-id="listado">Lista de Alumnos</button>
+        <button onclick="mostrarSeccion('historia')" class="hover:text-blue-900 transition" data-id="historia">Historia</button>
+        <button onclick="mostrarSeccion('ia')" class="hover:text-blue-900 transition" data-id="ia">IA Generativa</button>
+    </nav>
+
+    <main class="flex-1 p-6">
+        
+        <section id="home" class="seccion">
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold text-blue-800">🌤️ Clima Actual</h2>
+            </div>
+            <div class="max-w-md mx-auto bg-white rounded-xl shadow-2xl p-6 text-center">
+                <input id="ciudadInput" type="text" placeholder="Buscar ciudad..." class="w-full border p-3 rounded-lg mb-3 focus:ring-2 focus:ring-sky-500 outline-none">
+                <button id="buscarBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold">Buscar Clima</button>
+                <div id="climaResultado" class="text-gray-700 mt-5">
+                    <p>Ingrese una ciudad para ver el clima.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="cargar" class="seccion hidden">
+            <h2 class="text-3xl font-bold text-center mb-6 text-blue-800">📝 Cargar Nuevo Alumno</h2>
+
+            <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-2xl">
+                <div class="form-header-bar"></div>
+                <form id="formAlumno" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div id="formMessage" class="md:col-span-2 text-center py-2 hidden rounded-lg"></div>
+
+                    <input id="nombre" type="text" placeholder="Nombre" class="border rounded-lg p-3 focus:ring-2 focus:ring-sky-400 outline-none" required>
+                    <input id="apellido" type="text" placeholder="Apellido" class="border rounded-lg p-3 focus:ring-2 focus:ring-sky-400 outline-none" required>
+                    <input id="dni" type="number" placeholder="DNI (sin puntos)" class="border rounded-lg p-3 focus:ring-2 focus:ring-sky-400 outline-none" required>
+                    
+                    <select id="curso" class="border rounded-lg p-3 focus:ring-2 focus:ring-sky-400 outline-none" required>
+                        <option value="">Seleccione curso *</option>
+                        <option>1°A</option><option>1°B</option>
+                        <option>2°A</option><option>2°B</option>
+                        <option>3°A</option><option>3°B</option>
+                    </select>
+
+                    <input id="email" type="email" placeholder="Email" class="md:col-span-2 border rounded-lg p-3 focus:ring-2 focus:ring-sky-400 outline-none" required>
+                    
+                    <button type="submit" class="col-span-1 md:col-span-2 bg-sky-600 text-white font-bold py-3 rounded-lg hover:bg-sky-700 transition shadow-md">
+                        Guardar Alumno
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section id="listado" class="seccion hidden">
+            <h2 class="text-3xl font-bold text-center mb-6 text-blue-800">🧾 Listado de Alumnos</h2>
+            
+            <div class="max-w-5xl mx-auto bg-white p-6 rounded-xl shadow-2xl">
+                <div class="mb-4 flex gap-4">
+                    <select id="filtroCurso" class="border rounded-lg p-2 focus:ring-2 focus:ring-sky-400 outline-none">
+                        <option value="todos">Mostrar todos los cursos</option>
+                    </select>
+                    <button onclick="limpiarStorage()" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                        Limpiar Todos los Datos
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-200 text-center">
+                        <thead class="bg-sky-600 text-white">
+                            <tr>
+                                <th class="py-3 px-4 border border-sky-700">Nombre</th>
+                                <th class="py-3 px-4 border border-sky-700">Apellido</th>
+                                <th class="py-3 px-4 border border-sky-700">Curso</th>
+                                <th class="py-3 px-4 border border-sky-700">DNI</th>
+                                <th class="py-3 px-4 border border-sky-700">Email</th>
+                                <th class="py-3 px-4 border border-sky-700">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablaAlumnos">
+                            <tr><td colspan="6" class="py-4 text-gray-500">Cargando lista...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="historia" class="seccion hidden">
+            <h2 class="text-3xl font-bold text-center mb-6 text-blue-800">🏫 Historia de la Institución</h2>
+            <div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-2xl">
+                <img src="escuela_antigua2.jpg" alt="Institución Antigua" class="rounded-xl mb-6 shadow-md mx-auto w-full max-h-80 object-cover">
+                <p class="text-gray-700 leading-relaxed mb-6 text-justify">
+                    La Escuela Normal Superior en Lenguas Vivas Juan Bautista Alberdi es una institución educativa de gran trayectoria, comprometida con la formación integral de los estudiantes **desde 1975**, fomentando valores, conocimiento y vocación de servicio. A lo largo de sus décadas, ha evolucionado, adaptando sus métodos a las nuevas tecnologías y desafíos educativos.
+                </p>
+                <p class="text-gray-700 leading-relaxed mb-6 text-justify font-semibold">
+                    Nuestro compromiso se centra en la excelencia académica y la innovación, preparando a los futuros líderes con una visión crítica y global.
+                </p>
+                <img src="escuela.jpg" alt="Institución Actual" class="rounded-xl shadow-md mx-auto w-full max-h-80 object-cover">
+            </div>
+        </section>
+
+        <section id="ia" class="seccion hidden">
+            <h2 class="text-3xl font-bold text-center mb-6 text-blue-800">🤖 IA Generativa: Investigación y Reflexión</h2>
+
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-8 leading-relaxed space-y-5">
+                
+                <h3 class="text-2xl font-bold text-sky-600">1. ¿Qué es la IA Generativa?</h3>
+                <p class="text-gray-700 border-l-4 border-sky-400 pl-4">
+                    Es una rama de la inteligencia artificial que utiliza **modelos de lenguaje grandes (LLMs)** y redes neuronales para crear **contenido nuevo y original** (texto, imágenes, música, código, etc.) en lugar de solo analizar datos existentes. Su poder reside en predecir y ensamblar secuencias coherentes basándose en patrones aprendidos de vastos conjuntos de datos.
+                </p>
+
+                <h3 class="text-2xl font-bold text-sky-600">2. Herramientas Destacadas</h3>
+                <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                    <li>**ChatGPT (OpenAI):** Generación de texto, resúmenes, código y diálogos conversacionales.</li>
+                    <li>**GitHub Copilot (Microsoft/OpenAI):** Asistente de programación que autocompleta líneas o funciones enteras de código.</li>
+                    <li>**DALL·E (OpenAI):** Creación de imágenes artísticas y realistas a partir de descripciones de texto (prompts).</li>
+                </ul>
+
+                <h3 class="text-2xl font-bold text-sky-600">3. Ejemplos de Prompts Útiles para Desarrolladores</h3>
+                <blockquote class="bg-gray-100 p-4 rounded-lg italic border-l-4 border-blue-400 space-y-3">
+                    <p>**Para generar código JS:** *"Crea una función en JavaScript que valide si un DNI de Argentina es válido y que use expresiones regulares."*</p>
+                    <p>**Para Diseño Web (Tailwind):** *"Genera el código HTML y Tailwind CSS para un 'card' de producto moderno con una imagen, título, precio y un botón celeste."*</p>
+                </blockquote>
+
+                <h3 class="text-2xl font-bold text-sky-600">4. Debate: ¿La IA reemplaza o potencia al desarrollador?</h3>
+                <p class="text-gray-700 font-bold">La IA Generativa <span class="text-red-500">NO reemplaza</span>, sino que <span class="text-green-600">POTENCIA</span> al desarrollador.</p>
+                <ul class="list-disc list-inside ml-4 space-y-2 text-gray-700">
+                    <li>**Potenciación:** Se encarga de tareas repetitivas (boilerplate code, pruebas), permitiendo al desarrollador centrarse en la **lógica de negocio** y la **experiencia del usuario**.</li>
+                    <li>**No Reemplazo:** La IA no tiene **pensamiento crítico, contexto de negocio, ni capacidad de depuración compleja**; estas habilidades humanas siguen siendo esenciales. Es un copiloto, no el piloto.</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-sky-400 text-white text-center py-4 mt-6 shadow-inner">
+        © 2025 Institución Educativa
+    </footer>
+
+    <script>
+        
+        // --- NAVEGACIÓN (Mostrar/Ocultar Secciones) ---
+
+        const SECCIONES = document.querySelectorAll('.seccion');
+        const NAV_BUTTONS = document.querySelectorAll('nav button');
+
+        function mostrarSeccion(idSeccion) {
+            // 1. Ocultar todas las secciones y resetear estilos de botones
+            SECCIONES.forEach(s => s.classList.add('hidden'));
+            NAV_BUTTONS.forEach(btn => btn.classList.remove('font-extrabold', 'underline', 'text-blue-900'));
+            
+            // 2. Mostrar la sección solicitada
+            const seccionActiva = document.getElementById(idSeccion);
+            if (seccionActiva) {
+                seccionActiva.classList.remove('hidden');
+            }
+
+            // 3. Resaltar el botón activo
+            const botonActivo = document.querySelector(`nav button[data-id="${idSeccion}"]`);
+            if (botonActivo) {
+                botonActivo.classList.add('font-extrabold', 'underline', 'text-blue-900');
+            }
+
+            // 4. Si se carga el listado, actualizar la tabla
+            if (idSeccion === 'listado') {
+                cargarAlumnos();
+            }
+        }
+
+        // --- CLIMA (Widget de la Home) ---
+        // **NOTA: Debes reemplazar esta clave con una válida de OpenWeatherMap**
+        const apiKey = "ab1aa1b81bb50ba27432a398bab06ab7"; 
+        const buscarBtn = document.getElementById("buscarBtn");
+        const ciudadInput = document.getElementById("ciudadInput");
+        const climaResultado = document.getElementById("climaResultado");
+
+        // Event Listeners para buscar
+        if (buscarBtn) buscarBtn.addEventListener("click", obtenerClima);
+        if (ciudadInput) ciudadInput.addEventListener("keypress", e => { if (e.key === "Enter") obtenerClima(); });
+
+        async function obtenerClima() {
+            const ciudad = ciudadInput.value.trim();
+            if (!ciudad) return alert("Ingrese una ciudad.");
+
+            climaResultado.innerHTML = "<p class='text-gray-500'>Cargando...</p>";
+
+            try {
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${ciudad}&appid=${apiKey}&lang=es&units=metric`);
+                const data = await res.json();
+                
+                if (data.cod !== 200) {
+                    return climaResultado.innerHTML = `<p class='text-red-500'>❌ Ciudad no encontrada o error en la clave API.</p>`;
+                }
+
+                climaResultado.innerHTML = `
+                    <div class="flex flex-col items-center space-y-2 mt-4 animate-fadeIn">
+                        <h3 class="text-2xl font-bold text-blue-800">${data.name}, ${data.sys.country}</h3>
+                        <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" class="w-20 h-20">
+                        <p class="capitalize text-lg text-gray-700 font-medium">${data.weather[0].description}</p>
+                        <p class="text-5xl font-extrabold text-blue-700">${Math.round(data.main.temp)}°C</p>
+                        <p class="text-gray-600">Sensación térmica: ${Math.round(data.main.feels_like)}°C</p>
+                        <div class="flex justify-center gap-6 mt-3 text-sm text-gray-700">
+                            <p>💧 Humedad: ${data.main.humidity}%</p>
+                            <p>🌬️ Viento: ${(data.wind.speed * 3.6).toFixed(1)} km/h</p>
+                        </div>
+                    </div>`;
+            } catch (error) {
+                climaResultado.innerHTML = `<p class='text-red-500'>Hubo un error al intentar conectarse.</p>`;
+            }
+        }
+
+
+        // --- CRUD DE ALUMNOS (Cargar y Listar) ---
+
+        const formAlumno = document.getElementById('formAlumno');
+        const tablaAlumnos = document.getElementById('tablaAlumnos'); 
+        const filtroCurso = document.getElementById('filtroCurso');
+        const formMessage = document.getElementById('formMessage');
+
+        // Inicializa el array de alumnos desde el Local Storage o como array vacío
+        let alumnos = JSON.parse(localStorage.getItem('alumnos')) || [];
+
+        // Event Listener para guardar alumno
+        if(formAlumno) formAlumno.addEventListener('submit', guardarAlumno);
+        // Event Listener para filtrar por curso
+        if(filtroCurso) filtroCurso.addEventListener('change', cargarAlumnos);
+
+
+        // Función para guardar alumno con validación
+        function guardarAlumno(e) {
+            e.preventDefault(); // Detiene la recarga de la página
+
+            const dni = document.getElementById('dni').value.trim();
+            
+            // 1. Validación de DNI existente
+            if (alumnos.some(alumno => alumno.dni === dni)) {
+                formMessage.className = 'md:col-span-2 text-center py-2 rounded-lg bg-red-100 text-red-700';
+                formMessage.textContent = '❌ Error: Ya existe un alumno con ese DNI.';
+                formMessage.classList.remove('hidden');
+                return;
+            }
+
+            // 2. Creación del objeto alumno
+            const nuevoAlumno = {
+                nombre: document.getElementById('nombre').value.trim(),
+                apellido: document.getElementById('apellido').value.trim(),
+                dni: dni,
+                curso: document.getElementById('curso').value,
+                email: document.getElementById('email').value.trim()
+            };
+            
+            // 3. Guardar en el array y Local Storage
+            alumnos.push(nuevoAlumno);
+            localStorage.setItem('alumnos', JSON.stringify(alumnos));
+            
+            // 4. Mostrar éxito y limpiar
+            formMessage.className = 'md:col-span-2 text-center py-2 rounded-lg bg-green-100 text-green-700';
+            formMessage.textContent = '✅ Alumno guardado con éxito.';
+            formMessage.classList.remove('hidden');
+            formAlumno.reset();
+
+            // 5. Actualizar la lista y las opciones de filtro
+            cargarAlumnos();
+            actualizarOpcionesCurso(); 
+        }
+
+        // Función para actualizar el dropdown de filtro
+        function actualizarOpcionesCurso() {
+            if (!filtroCurso) return;
+            const cursosExistentes = [...new Set(alumnos.map(a => a.curso))].sort();
+            
+            const cursoSeleccionado = filtroCurso.value;
+            
+            filtroCurso.innerHTML = '<option value="todos">Mostrar todos los cursos</option>';
+            cursosExistentes.forEach(curso => {
+                const option = document.createElement('option');
+                option.value = curso;
+                option.textContent = curso;
+                filtroCurso.appendChild(option);
+            });
+
+            // Mantiene el filtro si es posible
+            filtroCurso.value = cursosExistentes.includes(cursoSeleccionado) ? cursoSeleccionado : 'todos';
+        }
+
+        // Función para cargar y mostrar alumnos en la tabla (incluye Filtrado)
+        function cargarAlumnos() {
+            if (!tablaAlumnos) return;
+            
+            // Recargar el array desde el Storage por si otra función lo modificó
+            alumnos = JSON.parse(localStorage.getItem('alumnos')) || [];
+            tablaAlumnos.innerHTML = '';
+            
+            const cursoAFiltrar = filtroCurso ? filtroCurso.value : 'todos';
+            const alumnosFiltrados = cursoAFiltrar === 'todos' 
+                                    ? alumnos 
+                                    : alumnos.filter(a => a.curso === cursoAFiltrar);
+
+            if (alumnos.length === 0) {
+                tablaAlumnos.innerHTML = '<tr><td colspan="6" class="py-4 text-gray-500">No hay alumnos cargados.</td></tr>';
+                return;
+            }
+            
+            if (alumnosFiltrados.length === 0) {
+                tablaAlumnos.innerHTML = `<tr><td colspan="6" class="py-4 text-orange-500">No hay alumnos en el curso ${cursoAFiltrar}.</td></tr>`;
+                return;
+            }
+
+            alumnosFiltrados.forEach((alumno) => {
+                const fila = document.createElement('tr');
+                fila.classList.add('hover:bg-sky-50', 'transition');
+
+                fila.innerHTML = `
+                    <td class="py-2 px-3 border border-gray-200">${alumno.nombre}</td>
+                    <td class="py-2 px-3 border border-gray-200">${alumno.apellido}</td>
+                    <td class="py-2 px-3 border border-gray-200 font-semibold">${alumno.curso}</td>
+                    <td class="py-2 px-3 border border-gray-200">${alumno.dni}</td>
+                    <td class="py-2 px-3 border border-gray-200">${alumno.email}</td>
+                    <td class="py-2 px-3 border border-gray-200">
+                        <button onclick="eliminarAlumno('${alumno.dni}')" class="text-red-600 hover:text-red-800 font-semibold transition">
+                            🗑️ Eliminar
+                        </button>
+                    </td>
+                `;
+                tablaAlumnos.appendChild(fila);
+            });
+        }
+
+        // Función para eliminar (Eliminar del CRUD)
+        function eliminarAlumno(dni) {
+            if (confirm(`¿Estás seguro de eliminar el alumno con DNI ${dni}? Esta acción no se puede deshacer.`)) {
+                
+                // Filtrar y crear un nuevo array sin el alumno a eliminar
+                alumnos = alumnos.filter(alumno => alumno.dni !== dni); 
+                
+                // Guardar la nueva lista en Local Storage
+                localStorage.setItem('alumnos', JSON.stringify(alumnos));
+                
+                // Recargar la tabla y opciones de filtro
+                cargarAlumnos(); 
+                actualizarOpcionesCurso();
+            }
+        }
+
+        // Función para borrar todos los datos
+        function limpiarStorage() {
+            if (confirm('ADVERTENCIA: ¿Desea eliminar TODA la información de alumnos guardada?')) {
+                localStorage.removeItem('alumnos');
+                alumnos = [];
+                cargarAlumnos();
+                actualizarOpcionesCurso();
+                alert('Datos de alumnos eliminados con éxito.');
+                mostrarSeccion('home');
+            }
+        }
+
+        // Ejecución inicial: Muestra el Home y carga los datos al finalizar el DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            mostrarSeccion('home');
+            cargarAlumnos();
+            actualizarOpcionesCurso();
+        });
+    </script>
+</body>
+</html>
